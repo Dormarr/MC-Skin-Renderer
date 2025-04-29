@@ -49,11 +49,12 @@ namespace MC_Skin_Aseprite_Previewer
             // Note: Flip vertically if needed
             return new Vector2[]
             {
-                new Vector2(u1, v2), // bottom-left
-                new Vector2(u2, v2), // bottom-right
-                new Vector2(u2, v1), // top-right
-                new Vector2(u1, v1)  // top-left
+                new Vector2(u1, v2), // Bottom Left
+                new Vector2(u2, v2), // Bottom Right
+                new Vector2(u2, v1), // Top Right
+                new Vector2(u1, v1)  // Top Left
             };
+
         }
     }
 

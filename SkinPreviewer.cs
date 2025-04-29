@@ -131,6 +131,7 @@ class SkinPreviewer : GameWindow
         UVMaps uvMaps = new UVMaps();
 
         GL.Begin(PrimitiveType.Quads);
+        CheckGLError("GL.Begin Quads");
         DrawCuboid(new Vector3(4, 16, 2), 8, 8, 8, faceOrder, uvMaps, 64, 64); // Head
         DrawCube(0f, 0f, 0f, 8f, 12f, 4f, 20, 20, 8, 12, name: "Body"); // Body
         /*
@@ -139,24 +140,20 @@ class SkinPreviewer : GameWindow
         DrawCube(-0.3f, -1.5f, 0, 4f, 12f, 4f, 4, 20, 4, 12, name: "Left Leg"); // Left Leg
         DrawCube(0.3f, -1.5f, 0, 4f, 12f, 4f, 4, 20, 4, 12, name: "Right Leg"); // Right Leg
         
-        
-        GL.Begin(PrimitiveType.Triangles);
-        GL.Color3(Color.Red);
-        GL.Vertex3(-0.5f, -0.5f, -2f);
-        GL.Color3(Color.Green);
-        GL.Vertex3(0.5f, -0.5f, -2f);
-        GL.Color3(Color.Blue);
-        GL.Vertex3(0, 0.5f, -2f);
         */
         
-        
         GL.End();
+        CheckGLError("GL.End");
         SwapBuffers();
+    }
 
-        ErrorCode err = GL.GetError();
-        if (err != ErrorCode.NoError)
-            Console.WriteLine("GL Error: " + err);
-
+    void CheckGLError(string context)
+    {
+        ErrorCode err;
+        while((err = GL.GetError()) != ErrorCode.NoError)
+        {
+            Console.WriteLine($"GL Error [{context}]: {err}");
+        }
     }
 
 
@@ -316,51 +313,51 @@ class SkinPreviewer : GameWindow
 
         Vector3[][] faceVertices = new Vector3[][]
         {
-            // Front - Counter-Clockwise
+            // Front (+Z)
             new Vector3[] {
-                new Vector3(-hw, -hh,  hd),
-                new Vector3( hw, -hh,  hd),
-                new Vector3( hw,  hh,  hd),
-                new Vector3(-hw,  hh,  hd)
+                new Vector3(-hw, -hh,  hd), // Bottom Left
+                new Vector3( hw, -hh,  hd), // Bottom Right
+                new Vector3( hw,  hh,  hd), // Top Right
+                new Vector3(-hw,  hh,  hd)  // Top Left
             },
-            // Back
+            // Back (-Z)
             new Vector3[] {
-                new Vector3( hw, -hh, -hd),
-                new Vector3(-hw, -hh, -hd),
-                new Vector3(-hw,  hh, -hd),
-                new Vector3( hw,  hh, -hd)
+                new Vector3( hw, -hh, -hd), // Bottom Right
+                new Vector3(-hw, -hh, -hd), // Bottom Left
+                new Vector3(-hw,  hh, -hd), // Top Left
+                new Vector3( hw,  hh, -hd)  // Top Right
             },
-            // Left
+            // Left (-X)
             new Vector3[] {
-                new Vector3(-hw, -hh, -hd),
-                new Vector3(-hw, -hh,  hd),
-                new Vector3(-hw,  hh,  hd),
-                new Vector3(-hw,  hh, -hd)
+                new Vector3(-hw, -hh, -hd), // Bottom Back
+                new Vector3(-hw, -hh,  hd), // Bottom Front
+                new Vector3(-hw,  hh,  hd), // Top Front
+                new Vector3(-hw,  hh, -hd)  // Top Back
             },
-            // Right
+            // Right (+X)
             new Vector3[] {
-                new Vector3( hw, -hh,  hd),
-                new Vector3( hw, -hh, -hd),
-                new Vector3( hw,  hh, -hd),
-                new Vector3( hw,  hh,  hd)
+                new Vector3( hw, -hh,  hd), // Bottom Front
+                new Vector3( hw, -hh, -hd), // Bottom Back
+                new Vector3( hw,  hh, -hd), // Top Back
+                new Vector3( hw,  hh,  hd)  // Top Front
             },
-            // Top
+            // Top (+Y)
             new Vector3[] {
-                new Vector3(-hw,  hh,  hd),
-                new Vector3( hw,  hh,  hd),
-                new Vector3( hw,  hh, -hd),
-                new Vector3(-hw,  hh, -hd)
+                new Vector3(-hw,  hh,  hd), // Front Left
+                new Vector3( hw,  hh,  hd), // Front Right
+                new Vector3( hw,  hh, -hd), // Back Right
+                new Vector3(-hw,  hh, -hd)  // Back Left
             },
-            // Bottom
+            // Bottom (-Y)
             new Vector3[] {
-                new Vector3(-hw, -hh, -hd),
-                new Vector3( hw, -hh, -hd),
-                new Vector3( hw, -hh,  hd),
-                new Vector3(-hw, -hh,  hd)
+                new Vector3(-hw, -hh, -hd), // Back Left
+                new Vector3( hw, -hh, -hd), // Back Right
+                new Vector3( hw, -hh,  hd), // Front Right
+                new Vector3(-hw, -hh,  hd)  // Front Left
             }
         };
 
-        for(int i = 0; i < 6; i++)
+        for (int i = 0; i < 6; i++)
         {
             UV faceUV = uvMaps.MapDict[faceOrder[i]];
             Vector2[] uvs = faceUV.GetNormalisedUVs(textureWidth, textureHeight);
@@ -390,8 +387,8 @@ class SkinPreviewer : GameWindow
     }
 
     void AddVertex(Vector3 pos, Vector2 uv)
-    {       
-        GL.TexCoord2(uv.X, uv.Y);   GL.Vertex3(pos.X, pos.Y, pos.Z);
+    {
+        GL.Vertex3(pos.X, pos.Y, pos.Z);    GL.TexCoord2(uv.X, uv.Y);
     }
 
 
