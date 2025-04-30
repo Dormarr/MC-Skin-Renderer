@@ -136,20 +136,57 @@ class SkinPreviewer : GameWindow
             ModelFace.Body_Bottom
         };
 
+        ModelFace[] armLeftOrder = new ModelFace[]
+        {
+            ModelFace.ArmLeft_Front,
+            ModelFace.ArmLeft_Back,
+            ModelFace.ArmLeft_Left,
+            ModelFace.ArmLeft_Right,
+            ModelFace.ArmLeft_Top,
+            ModelFace.ArmLeft_Bottom
+        };
+
+        ModelFace[] armRightOrder = new ModelFace[]
+        {
+            ModelFace.ArmRight_Front,
+            ModelFace.ArmRight_Back,
+            ModelFace.ArmRight_Left,
+            ModelFace.ArmRight_Right,
+            ModelFace.ArmRight_Top,
+            ModelFace.ArmRight_Bottom
+        };
+
+        ModelFace[] legLeftOrder = new ModelFace[]
+        {
+            ModelFace.LegLeft_Front,
+            ModelFace.LegLeft_Back,
+            ModelFace.LegLeft_Left,
+            ModelFace.LegLeft_Right,
+            ModelFace.LegLeft_Top,
+            ModelFace.LegLeft_Bottom
+        };
+
+        ModelFace[] legRightOrder = new ModelFace[]
+        {
+            ModelFace.LegRight_Front,
+            ModelFace.LegRight_Back,
+            ModelFace.LegRight_Left,
+            ModelFace.LegRight_Right,
+            ModelFace.LegRight_Top,
+            ModelFace.LegRight_Bottom
+        };
+
         UVMaps uvMaps = new UVMaps();
 
 
-        DrawCuboid(new Vector3(4, 16, 2), 8, 8, 8, headOrder, uvMaps, name: "Head"); // Head
-        DrawCuboid(new Vector3(4, 6, 2), 8, 12, 4, bodyOrder, uvMaps, name: "Body"); // Body
-        //DrawCube(0f, 0f, 0f, 8f, 12f, 4f, 20, 20, 8, 12, name: "Body"); // Body
-        /*
-        DrawCube(-1f, -0.5f, 0, 4f, 12f, 4f, 44, 20, 4, 12, name: "Left Arm"); // Left Arm
-        DrawCube(0.5f, -0.5f, 0, 4f, 12f, 4f, 44, 20, 4, 12, name: "Right Arm"); // Right Arm
-        DrawCube(-0.3f, -1.5f, 0, 4f, 12f, 4f, 4, 20, 4, 12, name: "Left Leg"); // Left Leg
-        DrawCube(0.3f, -1.5f, 0, 4f, 12f, 4f, 4, 20, 4, 12, name: "Right Leg"); // Right Leg
-        
-        */
-        
+        DrawCuboid(new Vector3(6, 16, 2), 8, 8, 8, headOrder, uvMaps, name: "Head"); // Head
+        DrawCuboid(new Vector3(6, 6, 2), 8, 12, 4, bodyOrder, uvMaps, name: "Body"); // Body
+        DrawCuboid(new Vector3(12, 6, 2), 4, 12, 4, armLeftOrder, uvMaps, name: "ArmLeft"); // Arm Left
+        DrawCuboid(new Vector3(0, 6, 2), 4, 12, 4, armRightOrder, uvMaps, name: "ArmRight"); // Arm Right
+        DrawCuboid(new Vector3(8, -6, 2), 4, 12, 4, legLeftOrder, uvMaps, name: "LegLeft"); // Leg Left
+        DrawCuboid(new Vector3(4, -6, 2), 4, 12, 4, legRightOrder, uvMaps, name: "LegRight"); // Leg Right
+
+
         SwapBuffers();
     }
 
@@ -375,6 +412,42 @@ class SkinPreviewer : GameWindow
                     break;
                 case ModelFace.Head_Bottom:
                     uvs = RotateUVs(uvs, 3);
+                    break;
+                case ModelFace.ArmLeft_Right:
+                    uvs = RotateUVs(uvs, 1);
+                    break;
+                case ModelFace.ArmRight_Left:
+                    uvs = RotateUVs(uvs, 1);
+                    break;
+                case ModelFace.ArmLeft_Back:
+                    uvs = RotateUVs(uvs, 1);
+                    break;
+                case ModelFace.ArmRight_Back:
+                    uvs = RotateUVs(uvs, 1);
+                    break;
+                case ModelFace.ArmLeft_Left:
+                    uvs = RotateUVs(uvs, 1);
+                    break;
+                case ModelFace.ArmRight_Right:
+                    uvs = RotateUVs(uvs, 1);
+                    break;
+                case ModelFace.LegRight_Right:
+                    uvs = RotateUVs(uvs, 1);
+                    break;
+                case ModelFace.LegRight_Left:
+                    uvs = RotateUVs(uvs, 1);
+                    break;
+                case ModelFace.LegRight_Back:
+                    uvs = RotateUVs(uvs, 1);
+                    break;
+                case ModelFace.LegLeft_Right:
+                    uvs = RotateUVs(uvs, 1);
+                    break;
+                case ModelFace.LegLeft_Left:
+                    uvs = RotateUVs(uvs, 1);
+                    break;
+                case ModelFace.LegLeft_Back:
+                    uvs = RotateUVs(uvs, 1);
                     break;
             }
 

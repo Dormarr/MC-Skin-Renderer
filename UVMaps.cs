@@ -23,6 +23,34 @@ namespace MC_Skin_Aseprite_Previewer
         Body_Right,
         Body_Top,
         Body_Bottom,
+
+        ArmLeft_Front,
+        ArmLeft_Back,
+        ArmLeft_Left,
+        ArmLeft_Right,
+        ArmLeft_Top,
+        ArmLeft_Bottom,
+
+        ArmRight_Front,
+        ArmRight_Back,
+        ArmRight_Left,
+        ArmRight_Right,
+        ArmRight_Top,
+        ArmRight_Bottom,
+
+        LegLeft_Front,
+        LegLeft_Back,
+        LegLeft_Left,
+        LegLeft_Right,
+        LegLeft_Top,
+        LegLeft_Bottom,
+
+        LegRight_Front,
+        LegRight_Back,
+        LegRight_Left,
+        LegRight_Right,
+        LegRight_Top,
+        LegRight_Bottom,
     }
 
     public class UV
@@ -78,7 +106,38 @@ namespace MC_Skin_Aseprite_Previewer
             MapDict.Add(ModelFace.Body_Right, new UV(28, 20, 4, 12));
             MapDict.Add(ModelFace.Body_Top, new UV(20, 16, 8, 4));
             MapDict.Add(ModelFace.Body_Bottom, new UV(28, 16, 8, 4));
+
+            MapDict.Add(ModelFace.LegRight_Front, new UV(4, 20, 4, 12));
+            MapDict.Add(ModelFace.LegRight_Back, new UV(12, 20, 4, 12));
+            MapDict.Add(ModelFace.LegRight_Left, new UV(0, 20, 4, 12));
+            MapDict.Add(ModelFace.LegRight_Right, new UV(8, 20, 4, 12));
+            MapDict.Add(ModelFace.LegRight_Top, new UV(4, 16, 4, 4));
+            MapDict.Add(ModelFace.LegRight_Bottom, new UV(8, 16, 4, 4));
+
+            MapDict.Add(ModelFace.LegLeft_Front, new UV(20, 52, 4, 12));
+            MapDict.Add(ModelFace.LegLeft_Back, new UV(28, 52, 4, 12));
+            MapDict.Add(ModelFace.LegLeft_Left, new UV(16, 52, 4, 12));
+            MapDict.Add(ModelFace.LegLeft_Right, new UV(24, 52, 4, 12));
+            MapDict.Add(ModelFace.LegLeft_Top, new UV(20, 48, 4, 4));
+            MapDict.Add(ModelFace.LegLeft_Bottom, new UV(24, 48, 4, 4));
+
+            MapDict.Add(ModelFace.ArmRight_Front, new UV(44, 20, 4, 12));
+            MapDict.Add(ModelFace.ArmRight_Back, new UV(52, 20, 4, 12));
+            MapDict.Add(ModelFace.ArmRight_Left, new UV(48, 20, 4, 12));
+            MapDict.Add(ModelFace.ArmRight_Right, new UV(40, 20, 4, 12));
+            MapDict.Add(ModelFace.ArmRight_Top, new UV(44, 16, 4, 4));
+            MapDict.Add(ModelFace.ArmRight_Bottom, new UV(48, 16, 4, 4));
+
+            MapDict.Add(ModelFace.ArmLeft_Front, new UV(36, 52, 4, 12));
+            MapDict.Add(ModelFace.ArmLeft_Back, new UV(44, 52, 4, 12));
+            MapDict.Add(ModelFace.ArmLeft_Left, new UV(40, 52, 4, 12));
+            MapDict.Add(ModelFace.ArmLeft_Right, new UV(32, 52, 4, 12));
+            MapDict.Add(ModelFace.ArmLeft_Top, new UV(36, 48, 4, 4));
+            MapDict.Add(ModelFace.ArmLeft_Bottom, new UV(40, 48, 4, 4));
+
+
+
         }
-        
+
     }
 }
