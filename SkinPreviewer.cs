@@ -37,7 +37,7 @@ class SkinPreviewer : GameWindow
         GL.Enable(EnableCap.DepthTest);
         GL.ClearColor(Color4.CornflowerBlue);
         GL.DepthFunc(DepthFunction.Less);
-        GL.Disable(EnableCap.CullFace);
+        GL.Enable(EnableCap.CullFace);
         GL.Enable(EnableCap.Texture2D);
 
 
@@ -102,9 +102,7 @@ class SkinPreviewer : GameWindow
         GL.MatrixMode(MatrixMode.Modelview);
         GL.LoadIdentity();
 
-        MouseState mouse = MouseState.GetSnapshot();
-
-        
+        MouseState mouse = MouseState.GetSnapshot();        
 
         camera.HandleInput(mouse, prevMouse, MouseState.ScrollDelta, AspectRatio);
         prevMouse = mouse;
@@ -118,7 +116,7 @@ class SkinPreviewer : GameWindow
 
         //DrawCube(0f, 12f, -2f, 8f, 8f, 8f, 8, 8, 8, 8, name: "Head"); // Head
 
-        ModelFace[] faceOrder = new ModelFace[]
+        ModelFace[] headOrder = new ModelFace[]
         {
             ModelFace.Head_Front,
             ModelFace.Head_Back,
@@ -128,12 +126,22 @@ class SkinPreviewer : GameWindow
             ModelFace.Head_Bottom
         };
 
+        ModelFace[] bodyOrder = new ModelFace[]
+        {
+            ModelFace.Body_Front,
+            ModelFace.Body_Back,
+            ModelFace.Body_Left,
+            ModelFace.Body_Right,
+            ModelFace.Body_Top,
+            ModelFace.Body_Bottom
+        };
+
         UVMaps uvMaps = new UVMaps();
 
-        GL.Begin(PrimitiveType.Quads);
-        CheckGLError("GL.Begin Quads");
-        DrawCuboid(new Vector3(4, 16, 2), 8, 8, 8, faceOrder, uvMaps, 64, 64); // Head
-        DrawCube(0f, 0f, 0f, 8f, 12f, 4f, 20, 20, 8, 12, name: "Body"); // Body
+
+        DrawCuboid(new Vector3(4, 16, 2), 8, 8, 8, headOrder, uvMaps, name: "Head"); // Head
+        DrawCuboid(new Vector3(4, 6, 2), 8, 12, 4, bodyOrder, uvMaps, name: "Body"); // Body
+        //DrawCube(0f, 0f, 0f, 8f, 12f, 4f, 20, 20, 8, 12, name: "Body"); // Body
         /*
         DrawCube(-1f, -0.5f, 0, 4f, 12f, 4f, 44, 20, 4, 12, name: "Left Arm"); // Left Arm
         DrawCube(0.5f, -0.5f, 0, 4f, 12f, 4f, 44, 20, 4, 12, name: "Right Arm"); // Right Arm
@@ -142,8 +150,6 @@ class SkinPreviewer : GameWindow
         
         */
         
-        GL.End();
-        CheckGLError("GL.End");
         SwapBuffers();
     }
 
@@ -305,7 +311,7 @@ class SkinPreviewer : GameWindow
         Vector2[] uvs = uvMaps.MapDict[face].GetNormalisedUVs(textureWidth, textureHeight);
     }
 
-    void DrawCuboid(Vector3 position, float width, float height, float depth, ModelFace[] faceOrder, UVMaps uvMaps, float textureWidth, float textureHeight)
+    void DrawCuboid(Vector3 position, float width, float height, float depth, ModelFace[] faceOrder, UVMaps uvMaps, float textureWidth = 64, float textureHeight = 64, string name = "Unnamed Cuboid")
     {
         float hw = width / 2f;
         float hh = height / 2f;
@@ -315,10 +321,10 @@ class SkinPreviewer : GameWindow
         {
             // Front (+Z)
             new Vector3[] {
+                new Vector3(-hw,  hh,  hd),  // Top Left
                 new Vector3(-hw, -hh,  hd), // Bottom Left
                 new Vector3( hw, -hh,  hd), // Bottom Right
                 new Vector3( hw,  hh,  hd), // Top Right
-                new Vector3(-hw,  hh,  hd)  // Top Left
             },
             // Back (-Z)
             new Vector3[] {
@@ -357,10 +363,21 @@ class SkinPreviewer : GameWindow
             }
         };
 
-        for (int i = 0; i < 6; i++)
+        for (int i = 0; i < faceOrder.Length; i++)
         {
             UV faceUV = uvMaps.MapDict[faceOrder[i]];
             Vector2[] uvs = faceUV.GetNormalisedUVs(textureWidth, textureHeight);
+
+            switch (faceOrder[i])
+            {
+                case ModelFace.Head_Right:
+                    uvs = RotateUVs(uvs, 2);
+                    break;
+                case ModelFace.Head_Bottom:
+                    uvs = RotateUVs(uvs, 3);
+                    break;
+            }
+
             Vector3[] verts = faceVertices[i];
 
             AddQuad(
@@ -371,24 +388,43 @@ class SkinPreviewer : GameWindow
                 uvs
             );
         }
+
+        Console.WriteLine($"Drawing {name}.");
     }
+
+    Vector2[] RotateUVs(Vector2[] uvs, int rotationSteps)
+    {
+        // rotationSteps: 0 = 0°, 1 = 90° CW, 2 = 180°, 3 = 270° CW
+        Vector2[] rotated = new Vector2[4];
+        for (int i = 0; i < 4; i++)
+        {
+            rotated[i] = uvs[(i + rotationSteps) % 4];
+        }
+        return rotated;
+    }
+
 
     void AddQuad(Vector3 v0, Vector3 v1, Vector3 v2, Vector3 v3, Vector2[] uvs)
     {
+        GL.Begin(PrimitiveType.Triangles);
+        CheckGLError("GL.Begin Quads");
         // Triangle 1
         AddVertex(v0, uvs[0]);
         AddVertex(v1, uvs[1]);
         AddVertex(v2, uvs[2]);
 
         // Triangle 2
+        AddVertex(v0, uvs[0]);
         AddVertex(v2, uvs[2]);
         AddVertex(v3, uvs[3]);
-        AddVertex(v0, uvs[0]);
+
+        GL.End();
     }
 
     void AddVertex(Vector3 pos, Vector2 uv)
     {
-        GL.Vertex3(pos.X, pos.Y, pos.Z);    GL.TexCoord2(uv.X, uv.Y);
+        GL.TexCoord2(uv.X, uv.Y);
+        GL.Vertex3(pos.X, pos.Y, pos.Z);
     }
 
 

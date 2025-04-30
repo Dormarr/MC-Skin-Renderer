@@ -15,8 +15,14 @@ namespace MC_Skin_Aseprite_Previewer
         Head_Left,
         Head_Right,
         Head_Top,
-        Head_Bottom
+        Head_Bottom,
         // Do the rest later.
+        Body_Front,
+        Body_Back,
+        Body_Left,
+        Body_Right,
+        Body_Top,
+        Body_Bottom,
     }
 
     public class UV
@@ -34,11 +40,6 @@ namespace MC_Skin_Aseprite_Previewer
             H = h;
         }
 
-        public UV GetUV()
-        {
-            return this;
-        }
-
         public Vector2[] GetNormalisedUVs(float textureWidth, float textureHeight)
         {
             float u1 = X / textureWidth;
@@ -49,10 +50,10 @@ namespace MC_Skin_Aseprite_Previewer
             // Note: Flip vertically if needed
             return new Vector2[]
             {
+                new Vector2(u1, v1), // Top Left
                 new Vector2(u1, v2), // Bottom Left
                 new Vector2(u2, v2), // Bottom Right
                 new Vector2(u2, v1), // Top Right
-                new Vector2(u1, v1)  // Top Left
             };
 
         }
@@ -70,6 +71,13 @@ namespace MC_Skin_Aseprite_Previewer
             MapDict.Add(ModelFace.Head_Right,   new UV(0, 8, 8, 8));
             MapDict.Add(ModelFace.Head_Top,     new UV(8, 0, 8, 8));
             MapDict.Add(ModelFace.Head_Bottom,  new UV(16, 0, 8, 8));
+
+            MapDict.Add(ModelFace.Body_Front, new UV(20, 20, 8, 12));
+            MapDict.Add(ModelFace.Body_Back, new UV(32, 20, 8, 12));
+            MapDict.Add(ModelFace.Body_Left, new UV(16, 20, 4, 12));
+            MapDict.Add(ModelFace.Body_Right, new UV(28, 20, 4, 12));
+            MapDict.Add(ModelFace.Body_Top, new UV(20, 16, 8, 4));
+            MapDict.Add(ModelFace.Body_Bottom, new UV(28, 16, 8, 4));
         }
         
     }
