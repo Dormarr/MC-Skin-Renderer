@@ -19,7 +19,7 @@ class SkinPreviewer : GameWindow
 {
     private int textureID;
     private string skinPath = "D:/Ryan/DesktopSH/Misc/Minecraft_Skins/skin.png"; // Change this!
-    private string triggerFile = "preview_trigger.txt";
+    private string triggerFile = "D:/Ryan/DesktopSH/Misc/Minecraft_Skins/preview_trigger.txt";
     private DateTime lastFileCheck = DateTime.MinValue;
 
     private OrbitalCamera camera = new OrbitalCamera();
@@ -230,19 +230,26 @@ class SkinPreviewer : GameWindow
     {
         if (File.Exists(skinPath))
         {
-            Bitmap bitmap = new Bitmap(skinPath);
-            BitmapData data = bitmap.LockBits(
-                new Rectangle(0, 0, bitmap.Width, bitmap.Height),
-                ImageLockMode.ReadOnly,
-                System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+            try
+            {
+                Bitmap bitmap = new Bitmap(skinPath);
+                BitmapData data = bitmap.LockBits(
+                    new Rectangle(0, 0, bitmap.Width, bitmap.Height),
+                    ImageLockMode.ReadOnly,
+                    System.Drawing.Imaging.PixelFormat.Format32bppArgb);
 
-            GL.BindTexture(TextureTarget.Texture2D, textureID);
-            GL.TexSubImage2D(TextureTarget.Texture2D, 0, 0, 0, bitmap.Width, bitmap.Height, OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, data.Scan0);
+                GL.BindTexture(TextureTarget.Texture2D, textureID);
+                GL.TexSubImage2D(TextureTarget.Texture2D, 0, 0, 0, bitmap.Width, bitmap.Height, OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, data.Scan0);
 
-            bitmap.UnlockBits(data);
-            bitmap.Dispose();
+                bitmap.UnlockBits(data);
+                bitmap.Dispose();
 
-            Console.WriteLine("Texture updated without recreation.");
+                Console.WriteLine("Texture updated without recreation.");
+            }
+            catch(Exception e)
+            {
+                Console.WriteLine($"Whoops! Error: {e.Message}");
+            }
         }
     }
 
@@ -408,10 +415,19 @@ class SkinPreviewer : GameWindow
             switch (faceOrder[i])
             {
                 case ModelFace.Head_Right:
-                    uvs = RotateUVs(uvs, 2);
+                    uvs = RotateUVs(uvs, 1);
+                    break;
+                case ModelFace.Head_Left:
+                    uvs = RotateUVs(uvs, 1);
                     break;
                 case ModelFace.Head_Bottom:
                     uvs = RotateUVs(uvs, 3);
+                    break;
+                case ModelFace.Head_Back:
+                    uvs = RotateUVs(uvs, 1);
+                    break;
+                case ModelFace.Head_Top:
+                    uvs = RotateUVs(uvs, 1);
                     break;
                 case ModelFace.ArmLeft_Right:
                     uvs = RotateUVs(uvs, 1);
@@ -462,7 +478,7 @@ class SkinPreviewer : GameWindow
             );
         }
 
-        Console.WriteLine($"Drawing {name}.");
+        //Console.WriteLine($"Drawing {name}.");
     }
 
     Vector2[] RotateUVs(Vector2[] uvs, int rotationSteps)

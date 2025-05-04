@@ -37,7 +37,7 @@ namespace MC_Skin_Aseprite_Previewer
                 // Clamp to avoid flipping.
                 pitch = Math.Clamp(pitch, -1.5f, 1.5f);
 
-                Console.WriteLine($"Mouse Delta: {delta.ToString()}");
+                //Console.WriteLine($"Mouse Delta: {delta.ToString()}");
             }
 
             // Scroll Zoom

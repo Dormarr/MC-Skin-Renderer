@@ -95,8 +95,8 @@ namespace MC_Skin_Aseprite_Previewer
         {
             MapDict.Add(ModelFace.Head_Front,   new UV(8, 8, 8, 8));
             MapDict.Add(ModelFace.Head_Back,    new UV(24, 8, 8, 8));
-            MapDict.Add(ModelFace.Head_Left,    new UV(16, 8, 8, 8));
-            MapDict.Add(ModelFace.Head_Right,   new UV(0, 8, 8, 8));
+            MapDict.Add(ModelFace.Head_Right,    new UV(16, 8, 8, 8));
+            MapDict.Add(ModelFace.Head_Left,   new UV(0, 8, 8, 8));
             MapDict.Add(ModelFace.Head_Top,     new UV(8, 0, 8, 8));
             MapDict.Add(ModelFace.Head_Bottom,  new UV(16, 0, 8, 8));
 
@@ -123,15 +123,15 @@ namespace MC_Skin_Aseprite_Previewer
 
             MapDict.Add(ModelFace.ArmRight_Front, new UV(44, 20, 4, 12));
             MapDict.Add(ModelFace.ArmRight_Back, new UV(52, 20, 4, 12));
-            MapDict.Add(ModelFace.ArmRight_Left, new UV(48, 20, 4, 12));
-            MapDict.Add(ModelFace.ArmRight_Right, new UV(40, 20, 4, 12));
+            MapDict.Add(ModelFace.ArmRight_Right, new UV(48, 20, 4, 12));
+            MapDict.Add(ModelFace.ArmRight_Left, new UV(40, 20, 4, 12));
             MapDict.Add(ModelFace.ArmRight_Top, new UV(44, 16, 4, 4));
             MapDict.Add(ModelFace.ArmRight_Bottom, new UV(48, 16, 4, 4));
 
             MapDict.Add(ModelFace.ArmLeft_Front, new UV(36, 52, 4, 12));
             MapDict.Add(ModelFace.ArmLeft_Back, new UV(44, 52, 4, 12));
-            MapDict.Add(ModelFace.ArmLeft_Left, new UV(40, 52, 4, 12));
-            MapDict.Add(ModelFace.ArmLeft_Right, new UV(32, 52, 4, 12));
+            MapDict.Add(ModelFace.ArmLeft_Right, new UV(40, 52, 4, 12));
+            MapDict.Add(ModelFace.ArmLeft_Left, new UV(32, 52, 4, 12));
             MapDict.Add(ModelFace.ArmLeft_Top, new UV(36, 48, 4, 4));
             MapDict.Add(ModelFace.ArmLeft_Bottom, new UV(40, 48, 4, 4));
 
