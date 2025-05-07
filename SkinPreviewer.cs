@@ -18,6 +18,8 @@ using ErrorCode = OpenTK.Graphics.OpenGL.ErrorCode;
 class SkinPreviewer : GameWindow
 {
     private int textureID;
+
+    // Need this to be based locally, or within aseprite? A set folder at least. Idk man let's just cheese it.
     private string skinPath = "D:/Ryan/DesktopSH/Misc/Minecraft_Skins/skin.png"; // Change this!
     private string triggerFile = "D:/Ryan/DesktopSH/Misc/Minecraft_Skins/preview_trigger.txt";
     private DateTime lastFileCheck = DateTime.MinValue;
@@ -37,7 +39,9 @@ class SkinPreviewer : GameWindow
         GL.Enable(EnableCap.DepthTest);
         GL.ClearColor(Color4.CornflowerBlue);
         GL.DepthFunc(DepthFunction.Less);
-        GL.Enable(EnableCap.CullFace);
+        GL.Enable(EnableCap.Blend);
+        GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
+        GL.Disable(EnableCap.CullFace);
         GL.Enable(EnableCap.Texture2D);
 
 
@@ -111,11 +115,6 @@ class SkinPreviewer : GameWindow
         GL.LoadMatrix(ref view);
 
 
-        // Draw the player model (each part is a cube)
-        //DrawCubeSolid(0f, 0f, 0f, 2f, 2f, 2f, Color.Red); // Test
-
-        //DrawCube(0f, 12f, -2f, 8f, 8f, 8f, 8, 8, 8, 8, name: "Head"); // Head
-
         ModelFace[] headOrder = new ModelFace[]
         {
             ModelFace.Head_Front,
@@ -176,6 +175,66 @@ class SkinPreviewer : GameWindow
             ModelFace.LegRight_Bottom
         };
 
+        ModelFace[] outerHeadOrder = new ModelFace[]
+        {
+            ModelFace.Outer_Head_Front,
+            ModelFace.Outer_Head_Back,
+            ModelFace.Outer_Head_Left,
+            ModelFace.Outer_Head_Right,
+            ModelFace.Outer_Head_Top,
+            ModelFace.Outer_Head_Bottom
+        };
+
+        ModelFace[] outerBodyOrder = new ModelFace[]
+{
+            ModelFace.Outer_Body_Front,
+            ModelFace.Outer_Body_Back,
+            ModelFace.Outer_Body_Left,
+            ModelFace.Outer_Body_Right,
+            ModelFace.Outer_Body_Top,
+            ModelFace.Outer_Body_Bottom
+};
+
+        ModelFace[] outerArmLeftOrder = new ModelFace[]
+        {
+            ModelFace.Outer_ArmLeft_Front,
+            ModelFace.Outer_ArmLeft_Back,
+            ModelFace.Outer_ArmLeft_Left,
+            ModelFace.Outer_ArmLeft_Right,
+            ModelFace.Outer_ArmLeft_Top,
+            ModelFace.Outer_ArmLeft_Bottom
+        };
+
+        ModelFace[] outerArmRightOrder = new ModelFace[]
+        {
+            ModelFace.Outer_ArmRight_Front,
+            ModelFace.Outer_ArmRight_Back,
+            ModelFace.Outer_ArmRight_Left,
+            ModelFace.Outer_ArmRight_Right,
+            ModelFace.Outer_ArmRight_Top,
+            ModelFace.Outer_ArmRight_Bottom
+        };
+
+        ModelFace[] outerLegLeftOrder = new ModelFace[]
+        {
+            ModelFace.Outer_LegLeft_Front,
+            ModelFace.Outer_LegLeft_Back,
+            ModelFace.Outer_LegLeft_Left,
+            ModelFace.Outer_LegLeft_Right,
+            ModelFace.Outer_LegLeft_Top,
+            ModelFace.Outer_LegLeft_Bottom
+        };
+
+        ModelFace[] outerLegRightOrder = new ModelFace[]
+        {
+            ModelFace.Outer_LegRight_Front,
+            ModelFace.Outer_LegRight_Back,
+            ModelFace.Outer_LegRight_Left,
+            ModelFace.Outer_LegRight_Right,
+            ModelFace.Outer_LegRight_Top,
+            ModelFace.Outer_LegRight_Bottom
+        };
+
         UVMaps uvMaps = new UVMaps();
 
 
@@ -186,6 +245,12 @@ class SkinPreviewer : GameWindow
         DrawCuboid(new Vector3(8, -6, 2), 4, 12, 4, legLeftOrder, uvMaps, name: "LegLeft"); // Leg Left
         DrawCuboid(new Vector3(4, -6, 2), 4, 12, 4, legRightOrder, uvMaps, name: "LegRight"); // Leg Right
 
+        DrawCuboid(new Vector3(6f, 16f, 2f), 8.75f, 8.75f, 8.75f, outerHeadOrder, uvMaps, name: "Hat");
+        DrawCuboid(new Vector3(6f, 6f, 2f), 8.75f, 12.75f, 4.75f, outerBodyOrder, uvMaps, name: "Outer Body");
+        DrawCuboid(new Vector3(12f, 6f, 2f), 4.75f, 12.75f, 4.75f, outerArmLeftOrder, uvMaps, name: "Outer Left Arm");
+        DrawCuboid(new Vector3(0f, 6f, 2f), 4.75f, 12.75f, 4.75f, outerArmRightOrder, uvMaps, name: "Outer Right Arm");
+        DrawCuboid(new Vector3(8f, -6f, 2f), 4.75f, 12.75f, 4.75f, outerLegLeftOrder, uvMaps, name: "Outer Left Leg");
+        DrawCuboid(new Vector3(4f, -6f, 2f), 4.75f, 12.75f, 4.75f, outerLegRightOrder, uvMaps, name: "Outer Right Leg");
 
         SwapBuffers();
     }
@@ -219,9 +284,6 @@ class SkinPreviewer : GameWindow
         GL.GenerateMipmap(GenerateMipmapTarget.Texture2D);
 
         bitmap.UnlockBits(data);
-
-        //GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
-        //GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
 
         return id;
     }
@@ -365,38 +427,38 @@ class SkinPreviewer : GameWindow
         {
             // Front (+Z)
             new Vector3[] {
+                new Vector3( hw,  hh,  hd), // Top Right
                 new Vector3(-hw,  hh,  hd),  // Top Left
                 new Vector3(-hw, -hh,  hd), // Bottom Left
                 new Vector3( hw, -hh,  hd), // Bottom Right
-                new Vector3( hw,  hh,  hd), // Top Right
             },
             // Back (-Z)
             new Vector3[] {
+                new Vector3( hw,  hh, -hd),  // Top Right
                 new Vector3( hw, -hh, -hd), // Bottom Right
                 new Vector3(-hw, -hh, -hd), // Bottom Left
                 new Vector3(-hw,  hh, -hd), // Top Left
-                new Vector3( hw,  hh, -hd)  // Top Right
             },
             // Left (-X)
             new Vector3[] {
+                new Vector3(-hw,  hh, -hd),  // Top Back
                 new Vector3(-hw, -hh, -hd), // Bottom Back
                 new Vector3(-hw, -hh,  hd), // Bottom Front
                 new Vector3(-hw,  hh,  hd), // Top Front
-                new Vector3(-hw,  hh, -hd)  // Top Back
             },
             // Right (+X)
             new Vector3[] {
+                new Vector3( hw,  hh,  hd),  // Top Front
                 new Vector3( hw, -hh,  hd), // Bottom Front
                 new Vector3( hw, -hh, -hd), // Bottom Back
                 new Vector3( hw,  hh, -hd), // Top Back
-                new Vector3( hw,  hh,  hd)  // Top Front
             },
             // Top (+Y)
             new Vector3[] {
+                new Vector3(-hw,  hh, -hd),  // Back Left
                 new Vector3(-hw,  hh,  hd), // Front Left
                 new Vector3( hw,  hh,  hd), // Front Right
                 new Vector3( hw,  hh, -hd), // Back Right
-                new Vector3(-hw,  hh, -hd)  // Back Left
             },
             // Bottom (-Y)
             new Vector3[] {
@@ -407,64 +469,88 @@ class SkinPreviewer : GameWindow
             }
         };
 
+
+        // Dude this sucks. I should have just adjusted the actual UV stuff. Big Cringe.
         for (int i = 0; i < faceOrder.Length; i++)
         {
             UV faceUV = uvMaps.MapDict[faceOrder[i]];
             Vector2[] uvs = faceUV.GetNormalisedUVs(textureWidth, textureHeight);
-
+            
             switch (faceOrder[i])
             {
-                case ModelFace.Head_Right:
-                    uvs = RotateUVs(uvs, 1);
+                case ModelFace.Head_Front:
+                    uvs = RotateUVs(uvs, 3);
                     break;
-                case ModelFace.Head_Left:
-                    uvs = RotateUVs(uvs, 1);
+                case ModelFace.Body_Front:
+                    uvs = RotateUVs(uvs, 3);
+                    break;
+                case ModelFace.LegLeft_Front:
+                    uvs = RotateUVs(uvs, 3);
+                    break;
+                case ModelFace.LegRight_Front:
+                    uvs = RotateUVs(uvs, 3);
+                    break;
+                case ModelFace.ArmRight_Front:
+                    uvs = RotateUVs(uvs, 3);
+                    break;
+                case ModelFace.ArmLeft_Front:
+                    uvs = RotateUVs(uvs, 3);
+                    break;
+                case ModelFace.Outer_Head_Front:
+                    uvs = RotateUVs(uvs, 3);
+                    break;
+                case ModelFace.Outer_Body_Front:
+                    uvs = RotateUVs(uvs, 3);
+                    break;
+                case ModelFace.Outer_LegLeft_Front:
+                    uvs = RotateUVs(uvs, 3);
+                    break;
+                case ModelFace.Outer_LegRight_Front:
+                    uvs = RotateUVs(uvs, 3);
+                    break;
+                case ModelFace.Outer_ArmRight_Front:
+                    uvs = RotateUVs(uvs, 3);
+                    break;
+                case ModelFace.Outer_ArmLeft_Front:
+                    uvs = RotateUVs(uvs, 3);
                     break;
                 case ModelFace.Head_Bottom:
                     uvs = RotateUVs(uvs, 3);
                     break;
-                case ModelFace.Head_Back:
-                    uvs = RotateUVs(uvs, 1);
+                case ModelFace.Body_Bottom:
+                    uvs = RotateUVs(uvs, 3);
                     break;
-                case ModelFace.Head_Top:
-                    uvs = RotateUVs(uvs, 1);
+                case ModelFace.LegLeft_Bottom:
+                    uvs = RotateUVs(uvs, 3);
                     break;
-                case ModelFace.ArmLeft_Right:
-                    uvs = RotateUVs(uvs, 1);
+                case ModelFace.LegRight_Bottom:
+                    uvs = RotateUVs(uvs, 3);
                     break;
-                case ModelFace.ArmRight_Left:
-                    uvs = RotateUVs(uvs, 1);
+                case ModelFace.ArmRight_Bottom:
+                    uvs = RotateUVs(uvs, 3);
                     break;
-                case ModelFace.ArmLeft_Back:
-                    uvs = RotateUVs(uvs, 1);
+                case ModelFace.ArmLeft_Bottom:
+                    uvs = RotateUVs(uvs, 3);
                     break;
-                case ModelFace.ArmRight_Back:
-                    uvs = RotateUVs(uvs, 1);
+                case ModelFace.Outer_Head_Bottom:
+                    uvs = RotateUVs(uvs, 3);
                     break;
-                case ModelFace.ArmLeft_Left:
-                    uvs = RotateUVs(uvs, 1);
+                case ModelFace.Outer_Body_Bottom:
+                    uvs = RotateUVs(uvs, 3);
                     break;
-                case ModelFace.ArmRight_Right:
-                    uvs = RotateUVs(uvs, 1);
+                case ModelFace.Outer_LegLeft_Bottom:
+                    uvs = RotateUVs(uvs, 3);
                     break;
-                case ModelFace.LegRight_Right:
-                    uvs = RotateUVs(uvs, 1);
+                case ModelFace.Outer_LegRight_Bottom:
+                    uvs = RotateUVs(uvs, 3);
                     break;
-                case ModelFace.LegRight_Left:
-                    uvs = RotateUVs(uvs, 1);
+                case ModelFace.Outer_ArmRight_Bottom:
+                    uvs = RotateUVs(uvs, 3);
                     break;
-                case ModelFace.LegRight_Back:
-                    uvs = RotateUVs(uvs, 1);
+                case ModelFace.Outer_ArmLeft_Bottom:
+                    uvs = RotateUVs(uvs, 3);
                     break;
-                case ModelFace.LegLeft_Right:
-                    uvs = RotateUVs(uvs, 1);
-                    break;
-                case ModelFace.LegLeft_Left:
-                    uvs = RotateUVs(uvs, 1);
-                    break;
-                case ModelFace.LegLeft_Back:
-                    uvs = RotateUVs(uvs, 1);
-                    break;
+
             }
 
             Vector3[] verts = faceVertices[i];
