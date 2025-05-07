@@ -1,4 +1,4 @@
-local sprite = app.activeSprite
+local sprite = app.sprite
 if not sprite then
     app.alert("No active sprite found!")
     return
@@ -11,33 +11,32 @@ if not skin_path or string.sub(skin_path, -4):lower() ~= ".png" then
     return
 end
 
--- Function to auto-save the sprite and trigger the preview update
-local function autoSaveSkin()
-    if not app.activeSprite then return end
+local base_path = string.match(skin_path, "^(.*)[/\\]")
 
-    local ok, err = pcall(function()
-        sprite:saveCopyAs(skin_path)
-    end)
+local function saveSkin()
+  if not app.sprite then return end
 
-    if not ok then
-        app.alert("Failed to save skin: " .. tostring(err))
-        return
-    end
+  local ok, err = pcall(function()
+    sprite:saveCopyAs(skin_path)
+  end)
 
-    local base_path = string.match(skin_path, "^(.*)[/\\]")
-    if base_path then
-        local trigger_file = io.open(base_path .. "/preview_trigger.txt", "w")
-        if trigger_file then
-            trigger_file:write("update\n")
-            trigger_file:close()
-        else
-            app.alert("Failed to write trigger file!")
-        end
+  if not ok then
+    print("Failed to save skin: " .. tostring(err))
+    return
+  end
+
+  if base_path then
+    local trigger_file = io.open(base_path .. "/preview_trigger.txt", "w")
+    if trigger_file then
+      trigger_file:write(".")
+      trigger_file:close()
     else
-        app.alert("Could not determine the file directory.")
+      print("Failed to write trigger file!")
     end
+  else
+    print("Could not determine the file directory.")
+  end
 end
 
--- Hook into Aseprite’s event system to trigger on canvas edits
-app.events:on("sitechange", autoSaveSkin)
-sprite.events:on("change", autoSaveSkin)
+
+sprite.events:on("change", saveSkin)
