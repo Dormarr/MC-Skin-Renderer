@@ -8,6 +8,13 @@ using OpenTK.Graphics.OpenGL;
 
 namespace MC_Skin_Aseprite_Previewer
 {
+    enum RenderState
+    {
+        AllVisible,
+        InnerOnly,
+        None
+    }
+
     internal class BodyPartUIPanel
     {
         public class BodyPartUIRegion
@@ -15,7 +22,7 @@ namespace MC_Skin_Aseprite_Previewer
             public string Name;
             public Vector2 Position;
             public Vector2 Size;
-            public bool Visible = true;
+            public RenderState State = RenderState.AllVisible;
 
             public Vector2 BottomRight => Position + Size;
 
@@ -26,7 +33,10 @@ namespace MC_Skin_Aseprite_Previewer
                     point.Y >= Position.Y && point.Y <= BottomRight.Y;
             }
 
-            public void Toggle() => Visible = !Visible;
+            public void CycleState()
+            {
+                State = (RenderState)(((int)State + 1) % 3);
+            }
 
         }
 
@@ -36,10 +46,10 @@ namespace MC_Skin_Aseprite_Previewer
         {
             Add("Head",     new Vector2(40, 64),     new Vector2(32, 32));
             Add("Body",     new Vector2(40, 96),    new Vector2(32, 48));
-            Add("ArmLeft",  new Vector2(24, 96),     new Vector2(16, 48));
-            Add("ArmRight", new Vector2(72, 96),    new Vector2(16, 48));
-            Add("LegLeft",  new Vector2(40, 144),    new Vector2(16, 48));
-            Add("LegRight", new Vector2(56, 144),    new Vector2(16, 48));
+            Add("ArmRight",  new Vector2(24, 96),     new Vector2(16, 48));
+            Add("ArmLeft", new Vector2(72, 96),    new Vector2(16, 48));
+            Add("LegRight",  new Vector2(40, 144),    new Vector2(16, 48));
+            Add("LegLeft", new Vector2(56, 144),    new Vector2(16, 48));
         }
 
         private void Add(string name, Vector2 pos, Vector2 size)
@@ -49,17 +59,29 @@ namespace MC_Skin_Aseprite_Previewer
 
         public void Render()
         {
-            foreach(var part in _regions)
+            foreach (var part in _regions)
             {
-                // Outer
-                DrawRect(part.Position, part.Size, part.Visible ? new Vector3(1.0f, 0.0f, 0.2f) : new Vector3(0.8f, 0.4f, 0.5f));
+                switch (part.State)
+                {
+                    case RenderState.AllVisible:
+                        DrawRect(part.Position, part.Size, new Vector3(1.0f, 0.0f, 0.2f)); // Red
+                        DrawRect(part.Position + new Vector2(4, 4), part.Size - new Vector2(8, 8), new Vector3(1.0f, 0.84f, 0.0f)); // Yellow (inner)
+                        break;
 
-                // Inner
-                DrawRect(part.Position + new Vector2(4, 4), part.Size - new Vector2(8, 8), new Vector3(1.0f, 0.84f, 0.0f));
+                    case RenderState.InnerOnly:
+                        DrawRect(part.Position, part.Size, new Vector3(0.8f, 0.4f, 0.5f)); // Dim red/orange outer
+                        DrawRect(part.Position + new Vector2(4, 4), part.Size - new Vector2(8, 8), new Vector3(1.0f, 0.84f, 0.0f)); // Yellow (inner)
+                        break;
+
+                    case RenderState.None:
+                        DrawRect(part.Position, part.Size, new Vector3(0.3f, 0.3f, 0.3f)); // Grey
+                        break;
+                }
 
                 GL.End();
             }
         }
+
 
         private void DrawRect(Vector2 pos, Vector2 size, Vector3 color)
         {
@@ -77,21 +99,17 @@ namespace MC_Skin_Aseprite_Previewer
             {
                 if (part.Contains(mousePos))
                 {
-                    Console.WriteLine($"Clicked on {part.Name}");
-                    part.Toggle();
+                    part.CycleState();
+                    Console.WriteLine($"Clicked on {part.Name}, making it {part.State}.");
                     break;
                 }
             }
         }
 
-        public Dictionary<string, bool> GetVisibleStates()
+        public Dictionary<string, RenderState> GetRenderStates()
         {
-            var result = new Dictionary<string, bool>();
-            foreach(var part in _regions)
-            {
-                result[part.Name] = part.Visible;
-            }
-            return result;
+            return _regions.ToDictionary(p => p.Name, p => p.State);
         }
+
     }
 }

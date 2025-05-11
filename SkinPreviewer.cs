@@ -104,6 +104,10 @@ class SkinPreviewer : GameWindow
 
     private void RenderUI()
     {
+        // There's still bugs here.
+        // When all are not on AllVisible it either goes black or stops rendering entirely.
+
+
         GL.MatrixMode(MatrixMode.Projection);
         GL.PushMatrix();
         GL.LoadMatrix(ref uiProjection);
@@ -112,7 +116,11 @@ class SkinPreviewer : GameWindow
         GL.PushMatrix();
         GL.LoadIdentity();
 
+        GL.Disable(EnableCap.DepthTest);
         bodyPanel.Render();
+        GL.Enable(EnableCap.DepthTest);
+
+        CheckGLError("UI");
 
         GL.PopMatrix(); // Restore modelview
         GL.MatrixMode(MatrixMode.Projection);
@@ -156,8 +164,7 @@ class SkinPreviewer : GameWindow
         GL.ClearColor(0.4f, 0.8f, 1.0f, 1.0f);
 
         GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
-        RenderUI();
-        GL.Color4(Color4.White); // Or whatever the default is for your model rendering
+        GL.Color4(Color4.White);
         GL.BindTexture(TextureTarget.Texture2D, textureID);
 
 
@@ -178,20 +185,34 @@ class SkinPreviewer : GameWindow
 
         DrawCuboid(new Vector3(6, 16, 2), 8, 8, 8, ModelFaceUtil.GetModelFacesByGroup("Head"), uvMaps, name: "Head"); // Head
         DrawCuboid(new Vector3(6, 6, 2), 8, 12, 4, ModelFaceUtil.GetModelFacesByGroup("Body"), uvMaps, name: "Body"); // Body
-        DrawCuboid(new Vector3(12, 6, 2), 4, 12, 4, ModelFaceUtil.GetModelFacesByGroup("ArmLeft"), uvMaps, name: "Left Arm"); // Arm Left
-        DrawCuboid(new Vector3(0, 6, 2), 4, 12, 4, ModelFaceUtil.GetModelFacesByGroup("ArmRight"), uvMaps, name: "Right Arm"); // Arm Right
-        DrawCuboid(new Vector3(8, -6, 2), 4, 12, 4, ModelFaceUtil.GetModelFacesByGroup("LegLeft"), uvMaps, name: "Left Leg"); // Leg Left
-        DrawCuboid(new Vector3(4, -6, 2), 4, 12, 4, ModelFaceUtil.GetModelFacesByGroup("LegRight"), uvMaps, name: "Right Leg"); // Leg Right
+        DrawCuboid(new Vector3(12, 6, 2), 4, 12, 4, ModelFaceUtil.GetModelFacesByGroup("ArmLeft"), uvMaps, name: "ArmLeft"); // Arm Left
+        DrawCuboid(new Vector3(0, 6, 2), 4, 12, 4, ModelFaceUtil.GetModelFacesByGroup("ArmRight"), uvMaps, name: "ArmRight"); // Arm Right
+        DrawCuboid(new Vector3(8, -6, 2), 4, 12, 4, ModelFaceUtil.GetModelFacesByGroup("LegLeft"), uvMaps, name: "LegLeft"); // Leg Left
+        DrawCuboid(new Vector3(4, -6, 2), 4, 12, 4, ModelFaceUtil.GetModelFacesByGroup("LegRight"), uvMaps, name: "LegRight"); // Leg Right
 
-        DrawCuboid(new Vector3(6f, 16f, 2f), 8.75f, 8.75f, 8.75f, ModelFaceUtil.GetModelFacesByGroup("OuterHead"), uvMaps, name: "Hat");
-        DrawCuboid(new Vector3(6f, 6f, 2f), 8.75f, 12.75f, 4.75f, ModelFaceUtil.GetModelFacesByGroup("OuterBody"), uvMaps, name: "Outer Body");
-        DrawCuboid(new Vector3(12f, 6f, 2f), 4.75f, 12.75f, 4.75f, ModelFaceUtil.GetModelFacesByGroup("OuterArmLeft"), uvMaps, name: "Outer Left Arm");
-        DrawCuboid(new Vector3(0f, 6f, 2f), 4.75f, 12.75f, 4.75f, ModelFaceUtil.GetModelFacesByGroup("OuterArmRight"), uvMaps, name: "Outer Right Arm");
-        DrawCuboid(new Vector3(8f, -6f, 2f), 4.75f, 12.75f, 4.75f, ModelFaceUtil.GetModelFacesByGroup("OuterLegLeft"), uvMaps, name: "Outer Left Leg");
-        DrawCuboid(new Vector3(4f, -6f, 2f), 4.75f, 12.75f, 4.75f, ModelFaceUtil.GetModelFacesByGroup("OuterLegRight"), uvMaps, name: "Outer Right Leg");
+        DrawCuboid(new Vector3(6f, 16f, 2f), 8.75f, 8.75f, 8.75f, ModelFaceUtil.GetModelFacesByGroup("OuterHead"), uvMaps, isOuter: true, name: "Head");
+        DrawCuboid(new Vector3(6f, 6f, 2f), 8.75f, 12.75f, 4.75f, ModelFaceUtil.GetModelFacesByGroup("OuterBody"), uvMaps, isOuter: true, name: "Body");
+        DrawCuboid(new Vector3(12f, 6f, 2f), 4.75f, 12.75f, 4.75f, ModelFaceUtil.GetModelFacesByGroup("OuterArmLeft"), uvMaps, isOuter: true, name: "ArmLeft");
+        DrawCuboid(new Vector3(0f, 6f, 2f), 4.75f, 12.75f, 4.75f, ModelFaceUtil.GetModelFacesByGroup("OuterArmRight"), uvMaps, isOuter: true, name: "ArmRight");
+        DrawCuboid(new Vector3(4f, -6f, 2f), 4.75f, 12.75f, 4.75f, ModelFaceUtil.GetModelFacesByGroup("OuterLegRight"), uvMaps, isOuter: true, name: "LegRight");
+        DrawCuboid(new Vector3(8f, -6f, 2f), 4.75f, 12.75f, 4.75f, ModelFaceUtil.GetModelFacesByGroup("OuterLegLeft"), uvMaps, isOuter: true, name: "LegLeft");
+
+        RenderUI();
 
         SwapBuffers();
     }
+
+    bool ShouldRender(string partName, RenderState state, bool isOuter)
+    {
+        return state switch
+        {
+            RenderState.AllVisible => true,
+            RenderState.InnerOnly => !isOuter,
+            RenderState.None => false,
+            _ => true
+        };
+    }
+
 
 
 
@@ -365,8 +386,13 @@ class SkinPreviewer : GameWindow
         Vector2[] uvs = uvMaps.MapDict[face].GetNormalisedUVs(textureWidth, textureHeight);
     }
 
-    void DrawCuboid(Vector3 position, float width, float height, float depth, ModelFace[] faceOrder, UVMaps uvMaps, float textureWidth = 64, float textureHeight = 64, string name = "Unnamed Cuboid")
+    void DrawCuboid(Vector3 position, float width, float height, float depth, ModelFace[] faceOrder, UVMaps uvMaps, float textureWidth = 64, float textureHeight = 64, string name = "Unnamed Cuboid", bool isOuter = false)
     {
+        if (!ShouldRender(name, bodyPanel.GetRenderStates()[name], isOuter) && !isOuter) return;
+        if (!ShouldRender(name, bodyPanel.GetRenderStates()[name], isOuter)) return;
+
+        
+
         float hw = width / 2f;
         float hh = height / 2f;
         float hd = depth / 2f;
