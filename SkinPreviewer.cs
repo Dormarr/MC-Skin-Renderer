@@ -28,6 +28,9 @@ class SkinPreviewer : GameWindow
     private MouseState prevMouse;
     private float AspectRatio;
 
+    BodyPartUIPanel bodyPanel = new BodyPartUIPanel();
+    Matrix4 uiProjection = new();
+
     public SkinPreviewer(GameWindowSettings gws, NativeWindowSettings nws) : base(gws, nws)
     {
         VSync = VSyncMode.On;
@@ -36,6 +39,7 @@ class SkinPreviewer : GameWindow
     protected override void OnLoad()
     {
         base.OnLoad();
+
         GL.Enable(EnableCap.DepthTest);
         GL.ClearColor(Color4.CornflowerBlue);
         GL.DepthFunc(DepthFunction.Less);
@@ -44,6 +48,7 @@ class SkinPreviewer : GameWindow
         GL.Disable(EnableCap.CullFace);
         GL.Enable(EnableCap.Texture2D);
 
+        ProjectUI();
 
         textureID = LoadTexture(skinPath);
         Console.WriteLine($"Loading texture from: {skinPath}");
@@ -72,6 +77,7 @@ class SkinPreviewer : GameWindow
         GL.MatrixMode(MatrixMode.Modelview);
         GL.LoadIdentity();
 
+        
     }
 
 
@@ -79,6 +85,7 @@ class SkinPreviewer : GameWindow
     protected override void OnUpdateFrame(FrameEventArgs e)
     {
         base.OnUpdateFrame(e);
+
 
         // Check if the preview trigger file has been updated
         if (File.Exists(triggerFile))
@@ -93,6 +100,40 @@ class SkinPreviewer : GameWindow
         }
     }
 
+    private void RenderUI()
+    {
+        GL.MatrixMode(MatrixMode.Projection);
+        GL.PushMatrix();
+        GL.LoadMatrix(ref uiProjection);
+
+        GL.MatrixMode(MatrixMode.Modelview);
+        GL.PushMatrix();
+        GL.LoadIdentity();
+
+        bodyPanel.Render();
+
+        GL.PopMatrix(); // Restore modelview
+        GL.MatrixMode(MatrixMode.Projection);
+        GL.PopMatrix(); // Restore projection
+        GL.MatrixMode(MatrixMode.Modelview);
+    }
+
+    protected override void OnMouseDown(MouseButtonEventArgs e)
+    {
+        base.OnMouseDown(e);
+        var mouse = MouseState;
+
+        if (e.Button != MouseButton.Left) return;
+
+        Console.WriteLine($"CLICKED! Mouse pos: {mouse.Position}");
+
+        var mousePos = new Vector2(mouse.X, mouse.Y);
+
+        mousePos.Y = Size.Y - mousePos.Y;
+
+        bodyPanel.HandleClick(mousePos);
+    }
+
     protected override void OnRenderFrame(FrameEventArgs args)
     {
         base.OnRenderFrame(args);
@@ -101,6 +142,7 @@ class SkinPreviewer : GameWindow
         GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
         GL.BindTexture(TextureTarget.Texture2D, textureID);
 
+        RenderUI();
 
         // Setup the model-view matrix
         GL.MatrixMode(MatrixMode.Modelview);
@@ -114,146 +156,27 @@ class SkinPreviewer : GameWindow
         Matrix4 view = camera.GetViewMatrix();
         GL.LoadMatrix(ref view);
 
-
-        ModelFace[] headOrder = new ModelFace[]
-        {
-            ModelFace.Head_Front,
-            ModelFace.Head_Back,
-            ModelFace.Head_Left,
-            ModelFace.Head_Right,
-            ModelFace.Head_Top,
-            ModelFace.Head_Bottom
-        };
-
-        ModelFace[] bodyOrder = new ModelFace[]
-        {
-            ModelFace.Body_Front,
-            ModelFace.Body_Back,
-            ModelFace.Body_Left,
-            ModelFace.Body_Right,
-            ModelFace.Body_Top,
-            ModelFace.Body_Bottom
-        };
-
-        ModelFace[] armLeftOrder = new ModelFace[]
-        {
-            ModelFace.ArmLeft_Front,
-            ModelFace.ArmLeft_Back,
-            ModelFace.ArmLeft_Left,
-            ModelFace.ArmLeft_Right,
-            ModelFace.ArmLeft_Top,
-            ModelFace.ArmLeft_Bottom
-        };
-
-        ModelFace[] armRightOrder = new ModelFace[]
-        {
-            ModelFace.ArmRight_Front,
-            ModelFace.ArmRight_Back,
-            ModelFace.ArmRight_Left,
-            ModelFace.ArmRight_Right,
-            ModelFace.ArmRight_Top,
-            ModelFace.ArmRight_Bottom
-        };
-
-        ModelFace[] legLeftOrder = new ModelFace[]
-        {
-            ModelFace.LegLeft_Front,
-            ModelFace.LegLeft_Back,
-            ModelFace.LegLeft_Left,
-            ModelFace.LegLeft_Right,
-            ModelFace.LegLeft_Top,
-            ModelFace.LegLeft_Bottom
-        };
-
-        ModelFace[] legRightOrder = new ModelFace[]
-        {
-            ModelFace.LegRight_Front,
-            ModelFace.LegRight_Back,
-            ModelFace.LegRight_Left,
-            ModelFace.LegRight_Right,
-            ModelFace.LegRight_Top,
-            ModelFace.LegRight_Bottom
-        };
-
-        ModelFace[] outerHeadOrder = new ModelFace[]
-        {
-            ModelFace.Outer_Head_Front,
-            ModelFace.Outer_Head_Back,
-            ModelFace.Outer_Head_Left,
-            ModelFace.Outer_Head_Right,
-            ModelFace.Outer_Head_Top,
-            ModelFace.Outer_Head_Bottom
-        };
-
-        ModelFace[] outerBodyOrder = new ModelFace[]
-{
-            ModelFace.Outer_Body_Front,
-            ModelFace.Outer_Body_Back,
-            ModelFace.Outer_Body_Left,
-            ModelFace.Outer_Body_Right,
-            ModelFace.Outer_Body_Top,
-            ModelFace.Outer_Body_Bottom
-};
-
-        ModelFace[] outerArmLeftOrder = new ModelFace[]
-        {
-            ModelFace.Outer_ArmLeft_Front,
-            ModelFace.Outer_ArmLeft_Back,
-            ModelFace.Outer_ArmLeft_Left,
-            ModelFace.Outer_ArmLeft_Right,
-            ModelFace.Outer_ArmLeft_Top,
-            ModelFace.Outer_ArmLeft_Bottom
-        };
-
-        ModelFace[] outerArmRightOrder = new ModelFace[]
-        {
-            ModelFace.Outer_ArmRight_Front,
-            ModelFace.Outer_ArmRight_Back,
-            ModelFace.Outer_ArmRight_Left,
-            ModelFace.Outer_ArmRight_Right,
-            ModelFace.Outer_ArmRight_Top,
-            ModelFace.Outer_ArmRight_Bottom
-        };
-
-        ModelFace[] outerLegLeftOrder = new ModelFace[]
-        {
-            ModelFace.Outer_LegLeft_Front,
-            ModelFace.Outer_LegLeft_Back,
-            ModelFace.Outer_LegLeft_Left,
-            ModelFace.Outer_LegLeft_Right,
-            ModelFace.Outer_LegLeft_Top,
-            ModelFace.Outer_LegLeft_Bottom
-        };
-
-        ModelFace[] outerLegRightOrder = new ModelFace[]
-        {
-            ModelFace.Outer_LegRight_Front,
-            ModelFace.Outer_LegRight_Back,
-            ModelFace.Outer_LegRight_Left,
-            ModelFace.Outer_LegRight_Right,
-            ModelFace.Outer_LegRight_Top,
-            ModelFace.Outer_LegRight_Bottom
-        };
-
         UVMaps uvMaps = new UVMaps();
 
 
-        DrawCuboid(new Vector3(6, 16, 2), 8, 8, 8, headOrder, uvMaps, name: "Head"); // Head
-        DrawCuboid(new Vector3(6, 6, 2), 8, 12, 4, bodyOrder, uvMaps, name: "Body"); // Body
-        DrawCuboid(new Vector3(12, 6, 2), 4, 12, 4, armLeftOrder, uvMaps, name: "ArmLeft"); // Arm Left
-        DrawCuboid(new Vector3(0, 6, 2), 4, 12, 4, armRightOrder, uvMaps, name: "ArmRight"); // Arm Right
-        DrawCuboid(new Vector3(8, -6, 2), 4, 12, 4, legLeftOrder, uvMaps, name: "LegLeft"); // Leg Left
-        DrawCuboid(new Vector3(4, -6, 2), 4, 12, 4, legRightOrder, uvMaps, name: "LegRight"); // Leg Right
+        DrawCuboid(new Vector3(6, 16, 2), 8, 8, 8, ModelFaceUtil.GetModelFacesByGroup("Head"), uvMaps, name: "Head"); // Head
+        DrawCuboid(new Vector3(6, 6, 2), 8, 12, 4, ModelFaceUtil.GetModelFacesByGroup("Body"), uvMaps, name: "Body"); // Body
+        DrawCuboid(new Vector3(12, 6, 2), 4, 12, 4, ModelFaceUtil.GetModelFacesByGroup("ArmLeft"), uvMaps, name: "Left Arm"); // Arm Left
+        DrawCuboid(new Vector3(0, 6, 2), 4, 12, 4, ModelFaceUtil.GetModelFacesByGroup("ArmRight"), uvMaps, name: "Right Arm"); // Arm Right
+        DrawCuboid(new Vector3(8, -6, 2), 4, 12, 4, ModelFaceUtil.GetModelFacesByGroup("LegLeft"), uvMaps, name: "Left Leg"); // Leg Left
+        DrawCuboid(new Vector3(4, -6, 2), 4, 12, 4, ModelFaceUtil.GetModelFacesByGroup("LegRight"), uvMaps, name: "Right Leg"); // Leg Right
 
-        DrawCuboid(new Vector3(6f, 16f, 2f), 8.75f, 8.75f, 8.75f, outerHeadOrder, uvMaps, name: "Hat");
-        DrawCuboid(new Vector3(6f, 6f, 2f), 8.75f, 12.75f, 4.75f, outerBodyOrder, uvMaps, name: "Outer Body");
-        DrawCuboid(new Vector3(12f, 6f, 2f), 4.75f, 12.75f, 4.75f, outerArmLeftOrder, uvMaps, name: "Outer Left Arm");
-        DrawCuboid(new Vector3(0f, 6f, 2f), 4.75f, 12.75f, 4.75f, outerArmRightOrder, uvMaps, name: "Outer Right Arm");
-        DrawCuboid(new Vector3(8f, -6f, 2f), 4.75f, 12.75f, 4.75f, outerLegLeftOrder, uvMaps, name: "Outer Left Leg");
-        DrawCuboid(new Vector3(4f, -6f, 2f), 4.75f, 12.75f, 4.75f, outerLegRightOrder, uvMaps, name: "Outer Right Leg");
+        DrawCuboid(new Vector3(6f, 16f, 2f), 8.75f, 8.75f, 8.75f, ModelFaceUtil.GetModelFacesByGroup("OuterHead"), uvMaps, name: "Hat");
+        DrawCuboid(new Vector3(6f, 6f, 2f), 8.75f, 12.75f, 4.75f, ModelFaceUtil.GetModelFacesByGroup("OuterBody"), uvMaps, name: "Outer Body");
+        DrawCuboid(new Vector3(12f, 6f, 2f), 4.75f, 12.75f, 4.75f, ModelFaceUtil.GetModelFacesByGroup("OuterArmLeft"), uvMaps, name: "Outer Left Arm");
+        DrawCuboid(new Vector3(0f, 6f, 2f), 4.75f, 12.75f, 4.75f, ModelFaceUtil.GetModelFacesByGroup("OuterArmRight"), uvMaps, name: "Outer Right Arm");
+        DrawCuboid(new Vector3(8f, -6f, 2f), 4.75f, 12.75f, 4.75f, ModelFaceUtil.GetModelFacesByGroup("OuterLegLeft"), uvMaps, name: "Outer Left Leg");
+        DrawCuboid(new Vector3(4f, -6f, 2f), 4.75f, 12.75f, 4.75f, ModelFaceUtil.GetModelFacesByGroup("OuterLegRight"), uvMaps, name: "Outer Right Leg");
 
         SwapBuffers();
     }
+
+
 
     void CheckGLError(string context)
     {
@@ -335,9 +258,17 @@ class SkinPreviewer : GameWindow
         }
     }
 
+    private void ProjectUI()
+    {
+        uiProjection = Matrix4.CreateOrthographicOffCenter(-16, Size.X, Size.Y, -64, -1, 1);
+    }
+
     protected override void OnResize(ResizeEventArgs e)
     {
         base.OnResize(e);
+
+        ProjectUI();
+        
         GL.Viewport(0, 0, Size.X, Size.Y);
 
         AspectRatio = Size.X / (float)Size.Y;

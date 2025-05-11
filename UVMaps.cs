@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using Vector2 = OpenTK.Mathematics.Vector2;
@@ -10,89 +11,106 @@ namespace MC_Skin_Aseprite_Previewer
 {
     enum ModelFace
     {
-        Head_Front,
-        Head_Back,
-        Head_Left,
-        Head_Right,
-        Head_Top,
-        Head_Bottom,
-        
-        Body_Front,
-        Body_Back,
-        Body_Left,
-        Body_Right,
-        Body_Top,
-        Body_Bottom,
+        [ModelFaceGroup("Head")]Head_Front,
+        [ModelFaceGroup("Head")]Head_Back,
+        [ModelFaceGroup("Head")]Head_Left,
+        [ModelFaceGroup("Head")]Head_Right,
+        [ModelFaceGroup("Head")]Head_Top,
+        [ModelFaceGroup("Head")]Head_Bottom,
 
-        ArmLeft_Front,
-        ArmLeft_Back,
-        ArmLeft_Left,
-        ArmLeft_Right,
-        ArmLeft_Top,
-        ArmLeft_Bottom,
+        [ModelFaceGroup("Body")]Body_Front,
+        [ModelFaceGroup("Body")]Body_Back,
+        [ModelFaceGroup("Body")]Body_Left,
+        [ModelFaceGroup("Body")]Body_Right,
+        [ModelFaceGroup("Body")]Body_Top,
+        [ModelFaceGroup("Body")]Body_Bottom,
 
-        ArmRight_Front,
-        ArmRight_Back,
-        ArmRight_Left,
-        ArmRight_Right,
-        ArmRight_Top,
-        ArmRight_Bottom,
+        [ModelFaceGroup("ArmLeft")]ArmLeft_Front,
+        [ModelFaceGroup("ArmLeft")]ArmLeft_Back,
+        [ModelFaceGroup("ArmLeft")]ArmLeft_Left,
+        [ModelFaceGroup("ArmLeft")]ArmLeft_Right,
+        [ModelFaceGroup("ArmLeft")]ArmLeft_Top,
+        [ModelFaceGroup("ArmLeft")]ArmLeft_Bottom,
 
-        LegLeft_Front,
-        LegLeft_Back,
-        LegLeft_Left,
-        LegLeft_Right,
-        LegLeft_Top,
-        LegLeft_Bottom,
+        [ModelFaceGroup("ArmRight")]ArmRight_Front,
+        [ModelFaceGroup("ArmRight")]ArmRight_Back,
+        [ModelFaceGroup("ArmRight")]ArmRight_Left,
+        [ModelFaceGroup("ArmRight")]ArmRight_Right,
+        [ModelFaceGroup("ArmRight")]ArmRight_Top,
+        [ModelFaceGroup("ArmRight")]ArmRight_Bottom,
 
-        LegRight_Front,
-        LegRight_Back,
-        LegRight_Left,
-        LegRight_Right,
-        LegRight_Top,
-        LegRight_Bottom,
+        [ModelFaceGroup("LegLeft")]LegLeft_Front,
+        [ModelFaceGroup("LegLeft")]LegLeft_Back,
+        [ModelFaceGroup("LegLeft")]LegLeft_Left,
+        [ModelFaceGroup("LegLeft")]LegLeft_Right,
+        [ModelFaceGroup("LegLeft")]LegLeft_Top,
+        [ModelFaceGroup("LegLeft")]LegLeft_Bottom,
 
-        Outer_Head_Front,
-        Outer_Head_Back,
-        Outer_Head_Left,
-        Outer_Head_Right,
-        Outer_Head_Top,
-        Outer_Head_Bottom,
+        [ModelFaceGroup("LegRight")]LegRight_Front,
+        [ModelFaceGroup("LegRight")]LegRight_Back,
+        [ModelFaceGroup("LegRight")]LegRight_Left,
+        [ModelFaceGroup("LegRight")]LegRight_Right,
+        [ModelFaceGroup("LegRight")]LegRight_Top,
+        [ModelFaceGroup("LegRight")]LegRight_Bottom,
+
+        [ModelFaceGroup("OuterHead")]Outer_Head_Front,
+        [ModelFaceGroup("OuterHead")]Outer_Head_Back,
+        [ModelFaceGroup("OuterHead")]Outer_Head_Left,
+        [ModelFaceGroup("OuterHead")]Outer_Head_Right,
+        [ModelFaceGroup("OuterHead")]Outer_Head_Top,
+        [ModelFaceGroup("OuterHead")]Outer_Head_Bottom,
         
-        Outer_Body_Front,
-        Outer_Body_Back,
-        Outer_Body_Left,
-        Outer_Body_Right,
-        Outer_Body_Top,
-        Outer_Body_Bottom,
+        [ModelFaceGroup("OuterBody")]Outer_Body_Front,
+        [ModelFaceGroup("OuterBody")]Outer_Body_Back,
+        [ModelFaceGroup("OuterBody")]Outer_Body_Left,
+        [ModelFaceGroup("OuterBody")]Outer_Body_Right,
+        [ModelFaceGroup("OuterBody")]Outer_Body_Top,
+        [ModelFaceGroup("OuterBody")]Outer_Body_Bottom,
         
-        Outer_ArmLeft_Front,
-        Outer_ArmLeft_Back,
-        Outer_ArmLeft_Left,
-        Outer_ArmLeft_Right,
-        Outer_ArmLeft_Top,
-        Outer_ArmLeft_Bottom,
+        [ModelFaceGroup("OuterArmLeft")]Outer_ArmLeft_Front,
+        [ModelFaceGroup("OuterArmLeft")]Outer_ArmLeft_Back,
+        [ModelFaceGroup("OuterArmLeft")]Outer_ArmLeft_Left,
+        [ModelFaceGroup("OuterArmLeft")]Outer_ArmLeft_Right,
+        [ModelFaceGroup("OuterArmLeft")]Outer_ArmLeft_Top,
+        [ModelFaceGroup("OuterArmLeft")]Outer_ArmLeft_Bottom,
         
-        Outer_ArmRight_Front,
-        Outer_ArmRight_Back,
-        Outer_ArmRight_Left,
-        Outer_ArmRight_Right,
-        Outer_ArmRight_Top,
-        Outer_ArmRight_Bottom,
+        [ModelFaceGroup("OuterArmRight")]Outer_ArmRight_Front,
+        [ModelFaceGroup("OuterArmRight")]Outer_ArmRight_Back,
+        [ModelFaceGroup("OuterArmRight")]Outer_ArmRight_Left,
+        [ModelFaceGroup("OuterArmRight")]Outer_ArmRight_Right,
+        [ModelFaceGroup("OuterArmRight")]Outer_ArmRight_Top,
+        [ModelFaceGroup("OuterArmRight")]Outer_ArmRight_Bottom,
         
-        Outer_LegLeft_Front,
-        Outer_LegLeft_Back,
-        Outer_LegLeft_Left,
-        Outer_LegLeft_Right,
-        Outer_LegLeft_Top,
-        Outer_LegLeft_Bottom,
-        
-        Outer_LegRight_Front,
-        Outer_LegRight_Back,
-        Outer_LegRight_Left,
-        Outer_LegRight_Right,
-        Outer_LegRight_Top,
-        Outer_LegRight_Bottom,
+        [ModelFaceGroup("OuterLegLeft")]Outer_LegLeft_Front,
+        [ModelFaceGroup("OuterLegLeft")]Outer_LegLeft_Back,
+        [ModelFaceGroup("OuterLegLeft")]Outer_LegLeft_Left,
+        [ModelFaceGroup("OuterLegLeft")]Outer_LegLeft_Right,
+        [ModelFaceGroup("OuterLegLeft")]Outer_LegLeft_Top,
+        [ModelFaceGroup("OuterLegLeft")]Outer_LegLeft_Bottom,
+
+        [ModelFaceGroup("OuterLegRight")]Outer_LegRight_Front,
+        [ModelFaceGroup("OuterLegRight")]Outer_LegRight_Back,
+        [ModelFaceGroup("OuterLegRight")]Outer_LegRight_Left,
+        [ModelFaceGroup("OuterLegRight")]Outer_LegRight_Right,
+        [ModelFaceGroup("OuterLegRight")]Outer_LegRight_Top,
+        [ModelFaceGroup("OuterLegRight")]Outer_LegRight_Bottom,
+    }
+
+    class ModelFaceGroupAttribute : Attribute
+    {
+        public string GroupName { get; }
+        public ModelFaceGroupAttribute(string groupName) =>  GroupName = groupName;
+    }
+
+    static class ModelFaceUtil
+    {
+        public static ModelFace[] GetModelFacesByGroup(string group)
+        {
+            return typeof(ModelFace).GetFields()
+               .Where(f => f.GetCustomAttribute<ModelFaceGroupAttribute>()?.GroupName == group)
+               .Select(f => (ModelFace)f.GetValue(null))
+               .ToArray();
+        }
     }
 
     public class UV
