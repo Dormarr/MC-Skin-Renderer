@@ -34,12 +34,12 @@ namespace MC_Skin_Aseprite_Previewer
 
         public BodyPartUIPanel()
         {
-            Add("Head",     new Vector2(40, 0),     new Vector2(32, 32));
-            Add("Body",     new Vector2(40, 32),    new Vector2(32, 48));
-            Add("ArmLeft",  new Vector2(24, 32),     new Vector2(16, 48));
-            Add("ArmRight", new Vector2(72, 32),    new Vector2(16, 48));
-            Add("LegLeft",  new Vector2(40, 80),    new Vector2(16, 48));
-            Add("LegRight", new Vector2(56, 80),    new Vector2(16, 48));
+            Add("Head",     new Vector2(40, 64),     new Vector2(32, 32));
+            Add("Body",     new Vector2(40, 96),    new Vector2(32, 48));
+            Add("ArmLeft",  new Vector2(24, 96),     new Vector2(16, 48));
+            Add("ArmRight", new Vector2(72, 96),    new Vector2(16, 48));
+            Add("LegLeft",  new Vector2(40, 144),    new Vector2(16, 48));
+            Add("LegRight", new Vector2(56, 144),    new Vector2(16, 48));
         }
 
         private void Add(string name, Vector2 pos, Vector2 size)
@@ -52,7 +52,7 @@ namespace MC_Skin_Aseprite_Previewer
             foreach(var part in _regions)
             {
                 // Outer
-                DrawRect(part.Position, part.Size, part.Visible ? new Vector3(1.0f, 0.0f, 0.0f) : new Vector3(0.4f, 0.4f, 0.4f));
+                DrawRect(part.Position, part.Size, part.Visible ? new Vector3(1.0f, 0.0f, 0.2f) : new Vector3(0.8f, 0.4f, 0.5f));
 
                 // Inner
                 DrawRect(part.Position + new Vector2(4, 4), part.Size - new Vector2(8, 8), new Vector3(1.0f, 0.84f, 0.0f));

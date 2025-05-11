@@ -27,6 +27,8 @@ class SkinPreviewer : GameWindow
     private OrbitalCamera camera = new OrbitalCamera();
     private MouseState prevMouse;
     private float AspectRatio;
+    public float windowWidth;
+    public float windowHeight;
 
     BodyPartUIPanel bodyPanel = new BodyPartUIPanel();
     Matrix4 uiProjection = new();
@@ -39,6 +41,7 @@ class SkinPreviewer : GameWindow
     protected override void OnLoad()
     {
         base.OnLoad();
+        ProjectUI();
 
         GL.Enable(EnableCap.DepthTest);
         GL.ClearColor(Color4.CornflowerBlue);
@@ -48,7 +51,6 @@ class SkinPreviewer : GameWindow
         GL.Disable(EnableCap.CullFace);
         GL.Enable(EnableCap.Texture2D);
 
-        ProjectUI();
 
         textureID = LoadTexture(skinPath);
         Console.WriteLine($"Loading texture from: {skinPath}");
@@ -125,24 +127,39 @@ class SkinPreviewer : GameWindow
 
         if (e.Button != MouseButton.Left) return;
 
-        Console.WriteLine($"CLICKED! Mouse pos: {mouse.Position}");
+        var mousePos = AdjustMousePosition(mouse);
 
-        var mousePos = new Vector2(mouse.X, mouse.Y);
+        Console.WriteLine($"CLICKED! Mouse pos: {mouse.Position}, GL Pos: {mousePos}");
+        Console.WriteLine($"Viewport: {Size.X}x{Size.Y}. Client Viewport: {windowWidth}x{windowHeight}.");
 
-        mousePos.Y = Size.Y - mousePos.Y;
 
         bodyPanel.HandleClick(mousePos);
+    }
+
+    Vector2 AdjustMousePosition(MouseState mouse)
+    {
+        Vector2 viewportDif = new Vector2(windowWidth - Size.X, windowHeight - Size.Y);
+        Vector2 newMousePos = new Vector2(mouse.X, mouse.Y - viewportDif.Y);
+
+        return newMousePos;
     }
 
     protected override void OnRenderFrame(FrameEventArgs args)
     {
         base.OnRenderFrame(args);
 
+        windowWidth = ClientSize.ToVector2().X;
+        windowHeight = ClientSize.ToVector2().Y;
+
+        GL.Viewport(0, 0, Size.X, Size.Y);
+
         GL.ClearColor(0.4f, 0.8f, 1.0f, 1.0f);
+
         GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
+        RenderUI();
+        GL.Color4(Color4.White); // Or whatever the default is for your model rendering
         GL.BindTexture(TextureTarget.Texture2D, textureID);
 
-        RenderUI();
 
         // Setup the model-view matrix
         GL.MatrixMode(MatrixMode.Modelview);
@@ -260,7 +277,7 @@ class SkinPreviewer : GameWindow
 
     private void ProjectUI()
     {
-        uiProjection = Matrix4.CreateOrthographicOffCenter(-16, Size.X, Size.Y, -64, -1, 1);
+        uiProjection = Matrix4.CreateOrthographicOffCenter(0, Size.X, Size.Y, 0, -1, 1);
     }
 
     protected override void OnResize(ResizeEventArgs e)
