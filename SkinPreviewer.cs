@@ -120,6 +120,7 @@ class SkinPreviewer : GameWindow
         bodyPanel.Render();
         GL.Enable(EnableCap.DepthTest);
 
+        // Uh oh.
         CheckGLError("UI");
 
         GL.PopMatrix(); // Restore modelview
